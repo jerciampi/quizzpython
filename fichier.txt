@@ -1,0 +1,36 @@
+QUES
+Quelle est la capitale de la France ? 
+PROP
+Lille 
+Annecy 
+Paris 
+Dunkerque
+REP
+2
+QUES
+Combien la France à de frontières ?
+PROP
+5
+8
+11
+13
+REP
+2
+QUES
+Combien y a t il de région en France métropolitaine ?
+PROP
+13
+18
+22
+8
+REP
+1
+QUES
+Quelle est la région la plus touristique de France ?
+PROP
+Ile de France
+Provence Alpes Côte d'Azur
+Auvergne Rhône Alpes
+Occitanie
+REP
+Ile de France
