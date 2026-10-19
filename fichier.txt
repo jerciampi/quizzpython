@@ -6,7 +6,7 @@ Annecy
 Paris 
 Dunkerque
 REP
-2
+Paris
 QUES
 Combien la France à de frontières ?
 PROP
@@ -15,7 +15,7 @@ PROP
 11
 13
 REP
-2
+11
 QUES
 Combien y a t il de région en France métropolitaine ?
 PROP
@@ -24,7 +24,7 @@ PROP
 22
 8
 REP
-1
+18
 QUES
 Quelle est la région la plus touristique de France ?
 PROP

@@ -2,12 +2,6 @@ import sqlite3
 from hashlib import sha512
 
 
-#  FONCTIONS DE SÉCURITÉ Hachage et Vérification
-
-
-
-
-
 connexion = sqlite3.connect("quiz_database.db")
 curseur = connexion.cursor()
 
@@ -83,7 +77,7 @@ def creer_compte(identifiant, mdp_en_clair):
     connexion.close()
 
 
-def login(identifiant, mdp_en_clair):
+def verifier_connexion(identifiant, mdp_en_clair):
     "Fonction pour se connecter"
     "On hache le mdp taper par l'utilisateur"
     connexion = sqlite3.connect("quiz_database.db")
@@ -97,17 +91,17 @@ def login(identifiant, mdp_en_clair):
     connexion.close()
 
     if resultat:
-    mdp_stocke, admin_statut = resultat
+        mdp_stocke, admin_statut = resultat
     # On hache le mot de passe entré pour le comparer à celui stocké
-    if hachage(mdp_en_clair) == mdp_stocke:
-        print(f"Connexion réussie ! Bienvenue {identifiant}.")
-        return True, admin_statut  # Renvoie True et le statut (admin ou non)
+        if hachage(mdp_en_clair) == mdp_stocke:
+            print(f"Connexion réussie ! Bienvenue {identifiant}.")
+            return True, admin_statut  # Renvoie True et le statut (admin ou non)
+        else:
+            print("Erreur : Mot de passe incorrect.")
+            return False, None
     else:
-        print("Erreur : Mot de passe incorrect.")
+        print(f"Erreur : L'identifiant '{identifiant}' n'existe pas.")
         return False, None
-    else:
-    print(f"Erreur : L'identifiant '{identifiant}' n'existe pas.")
-    return False, None
 
 def enregistrer_partie(identifiant, id_quiz, score):
   """Enregistre le score dans l'historique et met à jour le hscore si besoin."""
@@ -146,3 +140,46 @@ def enregistrer_partie(identifiant, id_quiz, score):
   connexion.commit()
   connexion.close()
   print("Partie enregistrée dans l'historique avec succès.")   
+
+def menu_console():
+  while True:
+    print("\n==============================")
+    print("      APPLICATION QUIZ        ")
+    print("==============================")
+    print("1. Créer un compte")
+    print("2. Se connecter")
+    print("3. Quitter")
+
+    choix = input("Votre choix (1, 2 ou 3) : ")
+
+    if choix == "1":
+      print("\n--- INSCRIPTION ---")
+      identifiant = input("Choisissez un identifiant : ")
+      mdp = input("Choisissez un mot de passe : ")
+      creer_compte(identifiant, mdp)
+
+    elif choix == "2":
+      print("\n--- CONNEXION ---")
+      identifiant = input("Identifiant : ")
+      mdp = input("Mot de passe : ")
+
+      # On appelle votre fonction de vérification
+      connecte, admin = verifier_connexion(identifiant, mdp)
+
+      if connecte:
+        print(f"\n[Succès] Bienvenue {identifiant} !")
+        if admin == 1:
+          print("-> Vous êtes connecté en tant qu'Administrateur.")
+          # TODO: Appeler ici le menu de création de quiz plus tard
+        else:
+          print("-> Vous êtes connecté en tant qu'Utilisateur classique.")
+          # TODO: Appeler ici le menu pour jouer à un quiz plus tard
+
+    elif choix == "3":
+      print("\nFermeture du programme. Au revoir !")
+      break
+
+    else:
+      print("\n[Erreur] Choix invalide, veuillez choisir entre 1, 2 et 3.")
+
+menu_console()
