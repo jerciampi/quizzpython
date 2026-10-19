@@ -1,5 +1,6 @@
 import sqlite3
 from hashlib import sha512
+import datetime
 
 
 connexion = sqlite3.connect("quiz_database.db")
@@ -138,7 +139,6 @@ def enregistrer_partie(identifiant, id_quiz, score):
     )
 
   connexion.commit()
-  connexion.close()
   print("Partie enregistrée dans l'historique avec succès.")   
 
 def menu_console():
@@ -148,9 +148,10 @@ def menu_console():
     print("==============================")
     print("1. Créer un compte")
     print("2. Se connecter")
-    print("3. Quitter")
+    print("3. Afficher la liste des identifiants")
+    print("4. Quitter")
 
-    choix = input("Votre choix (1, 2 ou 3) : ")
+    choix = input("Votre choix (1, 2, 3 ou 4) : ")
 
     if choix == "1":
       print("\n--- INSCRIPTION ---")
@@ -176,10 +177,21 @@ def menu_console():
           # TODO: Appeler ici le menu pour jouer à un quiz plus tard
 
     elif choix == "3":
+      connexion_temp = sqlite3.connect("quiz_database.db")
+      curseur_temp = connexion_temp.cursor()
+      
+      curseur_temp.execute("SELECT identifiant FROM Compte")
+      #fetchall() permet de récupérer tous les résultats sous forme de liste
+      utilisateurs = curseur_temp.fetchall() 
+      connexion_temp.close()
+      
+      print(f"\nVoici la liste des identifiants : {utilisateurs}")
+
+    elif choix == "4":
       print("\nFermeture du programme. Au revoir !")
       break
 
     else:
-      print("\n[Erreur] Choix invalide, veuillez choisir entre 1, 2 et 3.")
+      print("\n[Erreur] Choix invalide, veuillez choisir entre 1, 2, 3 et 4.")
 
 menu_console()
