@@ -128,9 +128,10 @@ zone_logo.pack(
 
 # Création du bouton servant de logo
 # Un clic permet de revenir à la page d'accueil
+photo = tk.PhotoImage(file="logo.png")
 logo = tk.Button(
     zone_logo,
-    text="LOGO",
+    image=photo,
     command=lambda: afficher_page("Accueil"),
     bg="#d5d5d9",
     fg="#55565e",
@@ -255,7 +256,7 @@ for nom_page, titre, description, message in (
         "Accueil",
         "Bienvenue sur SQuizi !",
         "Votre espace pour apprendre en vous amusant.",
-        "Les activités seront bientôt disponibles.",
+        "Est-ce que c'est bon pour vous ?",
     ),
     (
         "Mes activités",
@@ -986,7 +987,7 @@ mode_connexion = tk.StringVar(value="Connexion")
 
 # Variables associées aux champs de saisie
 # Tkinter les met à jour automatiquement lorsque l'utilisateur écrit
-nom_utilisateur = tk.StringVar()
+
 identifiant = tk.StringVar()
 mot_de_passe = tk.StringVar()
 
@@ -1027,7 +1028,6 @@ tk.Label(
 # Champ de saisie du nom de l'utilisateur
 tk.Entry(
     champ_nom,
-    textvariable=nom_utilisateur,
     font=("Arial", 12)
 ).pack(fill="x", ipady=6)
 
@@ -1194,7 +1194,7 @@ def envoyer_formulaire_auth():
     # En mode création de compte, le nom devient obligatoire
     if mode_connexion.get() == "Créer mon compte":
         champs_requis.append(
-            nom_utilisateur.get().strip()
+            identifiant.get().strip()
         )
 
     # Vérifie que tous les champs requis sont remplis
@@ -1209,7 +1209,7 @@ def envoyer_formulaire_auth():
     # Détermine le nom à afficher :
     # le nom saisi, ou l'identifiant si le nom est vide
     identite = (
-        nom_utilisateur.get().strip()
+        identifiant.get().strip()
         or identifiant.get().strip()
     )
 
