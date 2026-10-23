@@ -1,0 +1,90 @@
+QUES
+Quel joueur de tennis a gagné le plus de grand chelem ? 
+PROP 
+Nadal 
+Djokovic 
+Sampras 
+Federer 
+REP 
+Djokovic 
+QUES
+Combien de ballon d'or a Lionel Messi ? 
+PROP 
+7 
+8 
+9 
+10 
+REP 
+8 
+QUES
+Quel est le meilleur buteur de l'histoire de la coupe du monde de football ? 
+PROP 
+Lionel Messi 
+Kylian Mbappé 
+Djaniil Scoriziy 
+Cristiano Ronaldo 
+REP 
+Kylian Mbappé 
+QUES
+Quel est le plus grand joueur de nba actuellement ? 
+PROP 
+Victor Wembanyama 
+Zack Edey 
+Jamarion Sharp 
+LeBron James 
+REP 
+Jamarion Sharp 
+QUES
+En combien de trous se joue un parcours de golf classique ? 
+PROP 
+9 
+12 
+15 
+18 
+REP 
+18 
+QUES
+Quel est le poids d'une balle de ping pong ? 
+PROP 
+1.1g 
+27g 
+2.7g 
+11g 
+REP 
+2.7g 
+QUES
+En combien de point de joue une partie de pétanque ? 
+PROP 
+10 
+11 
+12 
+13 
+REP 
+13 
+QUES
+Quel est le sportif français qui a le plus de médailles d'or aux JO ? 
+PROP 
+Léon Marchand 
+Teddy Riner 
+Martin Fourcade 
+Adrien Henry 
+REP 
+Martin Fourcade 
+QUES
+Qui a gagné le tournoi des 6 Nations 2026 ? 
+PROP 
+Angleterre 
+Irlande 
+Italie 
+France 
+REP 
+France 
+QUES
+Qui a gagné le plus de Grand Prix en Formule 1 ? 
+PROP 
+Michael Schumacher 
+Ayrton Senna 
+Lewis Hamilton 
+Max Verstappen 
+REP 
+Lewis Hamilton 

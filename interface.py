@@ -1,5 +1,6 @@
 # Importation de la bibliothèque Tkinter pour créer l'interface graphique
 import tkinter as tk
+from PIL import Image, ImageTk
 
 
 # ============================================================
@@ -1256,6 +1257,26 @@ bouton_changer_mode.configure(
     command=changer_mode_auth,
 )
 
+# Chargement et redimensionnement de l'image (ex. 40 px de hauteur)
+img_brute = Image.open("logo.png")
+# Adapter les dimensions pour tenir dans la barre de 64 px
+img_redim = img_brute.resize((40, 40), Image.Resampling.LANCZOS)
+photo = ImageTk.PhotoImage(img_redim)
+
+# Création du bouton servant de logo
+logo = tk.Button(
+    zone_logo,
+    image=photo,
+    command=lambda: afficher_page("Accueil"),
+    bg="#e6e6e8",
+    relief="flat",
+    borderwidth=0,
+    activebackground="#d5d5d9",
+    cursor="hand2",
+)
+logo.image = photo  # Conserve une référence pour éviter le ramasse-miettes
+logo.pack()
+
 
 # ============================================================
 # 28. AFFICHAGE INITIAL ET LANCEMENT DE L'APPLICATION
@@ -1272,3 +1293,4 @@ pages["Connexion"].tkraise()
 # Elle maintient la fenêtre ouverte et gère les clics,
 # les saisies et les autres événements de l'interface
 fenetre.mainloop()
+
