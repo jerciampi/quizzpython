@@ -1,36 +1,18 @@
-with open("fichier.txt", "r", encoding="utf-8") as fichier:
-    lignes = fichier.readlines()      
+def nouveau_quiz():
+    titre = input("Titre du quiz : ")
+    with open(f"Quiz/{titre}.txt", "w", encoding="utf-8") as new_file:    
+        taille = int(input("Combien de questions comporte le quiz ? "))
+        for i in range(taille):
+            new_file.write("QUES\n")
+            q1 = input("Question : ")
+            new_file.write(f"{q1} \n")
+            new_file.write("PROP \n")
+            nb = int(input("Nombre de propositions : "))
+            for j in range(nb):
+                p = input(f"{j + 1} proposition : ")
+                new_file.write(f"{p} \n")
+            new_file.write("REP \n")
+            r = input("La bonne réponse est : ")
+            new_file.write(f"{r} \n")
+    return True
 
-contenu = []
-for l in lignes:
-    contenu.append(l.strip())
-print(contenu)
-    
-questions = []
-propositions = []
-reponses = []
-
-for i in range(len(contenu)):
-    if contenu[i] == "QUES":
-        questions.append(contenu[i+1])
-    elif contenu[i] == "REP":
-            reponses.append(contenu[i+1])
-    elif contenu[i] == "PROP":
-        prop = []
-        for j in range(i+1, len(contenu)):
-            if contenu[j] != "REP":
-                prop.append(contenu[j])
-            elif contenu[j] == "REP":
-                break
-        propositions.append(prop)
-    
-
-
-print(f"les questions sont : {questions}")
-print(f"les propositions sont : {propositions}")
-print(f"les reponses sont : {reponses}")
-
-"""
-with open("nouveau_quiz.txt", "w", encoding="utf-8") as new:
-    new.write("inshalla ça marche")
-"""

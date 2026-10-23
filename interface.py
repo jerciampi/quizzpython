@@ -1,6 +1,7 @@
 # Importation de la bibliothèque Tkinter pour créer l'interface graphique
 import tkinter as tk
 from PIL import Image, ImageTk
+from database_quiz import verifier_connexion,enregistrer_partie,creer_compte
 
 
 # ============================================================
@@ -129,10 +130,9 @@ zone_logo.pack(
 
 # Création du bouton servant de logo
 # Un clic permet de revenir à la page d'accueil
-photo = tk.PhotoImage(file="logo.png")
+
 logo = tk.Button(
     zone_logo,
-    image=photo,
     command=lambda: afficher_page("Accueil"),
     bg="#d5d5d9",
     fg="#55565e",
@@ -1191,34 +1191,43 @@ def envoyer_formulaire_auth():
         identifiant.get().strip(),
         mot_de_passe.get()
     ]
+    identifiant_creer=champs_requis[0]
+    mdp_creer=champs_requis[1]
 
     # En mode création de compte, le nom devient obligatoire
     if mode_connexion.get() == "Créer mon compte":
-        champs_requis.append(
-            identifiant.get().strip()
-        )
+        # Vérifie que tous les champs requis sont remplis
+        if not all(champs_requis):
+            # Affiche un message si un champ est vide
+            statut_auth.set(
+                "Merci de remplir tous les champs."
+            )
+            return
+        
+        #verifie la connexion avec la bd
+        if not(creer_compte(identifiant_creer, mdp_creer)):
+            statut_auth.set(
+                "L'identifiant existe déjà"
+            )
+            return
+    else:
+        # Vérifie que tous les champs requis sont remplis
+        if not all(champs_requis):
+            # Affiche un message si un champ est vide
+            statut_auth.set(
+                "Merci de remplir tous les champs."
+            )
+            return
+        
+        #verifie la connexion avec la bd
+        if not(verifier_connexion(identifiant_creer, mdp_creer)[0]):
+            statut_auth.set(
+                "Mot de passe ou identifiant incorrect"
+            )
+            return
+        else:
+            admin=verifier_connexion(identifiant_creer, mdp_creer)[1]
 
-    # Vérifie que tous les champs requis sont remplis
-    if not all(champs_requis):
-
-        # Affiche un message si un champ est vide
-        statut_auth.set(
-            "Merci de remplir tous les champs."
-        )
-        return
-
-    # Détermine le nom à afficher :
-    # le nom saisi, ou l'identifiant si le nom est vide
-    identite = (
-        identifiant.get().strip()
-        or identifiant.get().strip()
-    )
-
-    # Affiche l'identité de l'utilisateur sur la page Compte
-    # Le message précise que les données ne sont pas enregistrées
-    identite_compte.set(
-        "Session provisoire : les identifiants ne sont pas enregistrés."
-    )
 
     # Indique que l'utilisateur est considéré comme connecté
     connecte = True
@@ -1257,25 +1266,7 @@ bouton_changer_mode.configure(
     command=changer_mode_auth,
 )
 
-# Chargement et redimensionnement de l'image (ex. 40 px de hauteur)
-img_brute = Image.open("logo.png")
-# Adapter les dimensions pour tenir dans la barre de 64 px
-img_redim = img_brute.resize((40, 40), Image.Resampling.LANCZOS)
-photo = ImageTk.PhotoImage(img_redim)
 
-# Création du bouton servant de logo
-logo = tk.Button(
-    zone_logo,
-    image=photo,
-    command=lambda: afficher_page("Accueil"),
-    bg="#e6e6e8",
-    relief="flat",
-    borderwidth=0,
-    activebackground="#d5d5d9",
-    cursor="hand2",
-)
-logo.image = photo  # Conserve une référence pour éviter le ramasse-miettes
-logo.pack()
 
 
 # ============================================================
