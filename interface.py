@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 from database_quiz import verifier_connexion,enregistrer_partie,creer_compte
 
 
+
 # ============================================================
 # 1. INITIALISATION DE LA FENÊTRE PRINCIPALE
 # ============================================================
@@ -15,7 +16,7 @@ fenetre = tk.Tk()
 fenetre.title("SQuizi")
 
 # Définition de la taille initiale de la fenêtre
-fenetre.geometry("900x600")
+fenetre.geometry("900x700")
 
 # Définition de la taille minimale de la fenêtre
 fenetre.minsize(650, 450)
@@ -695,6 +696,7 @@ def commencer_quiz():
 # ============================================================
 
 def terminer_quiz():
+    global identifiant_bd
     # Calcule le nombre de bonnes réponses
     # zip associe chaque réponse à la question correspondante
     # La comparaison renvoie True si la réponse est correcte
@@ -703,7 +705,8 @@ def terminer_quiz():
         reponse == question["reponse"]
         for reponse, question in zip(reponses, questions)
     )
-
+    #enregistre dans l'historique
+    enregistrer_partie(identifiant_bd, 1, score)
     # Affiche le score obtenu sur le nombre total de questions
     score_final.set(
         f"Votre score : {score} / {len(questions)}"
@@ -990,6 +993,7 @@ mode_connexion = tk.StringVar(value="Connexion")
 # Tkinter les met à jour automatiquement lorsque l'utilisateur écrit
 
 identifiant = tk.StringVar()
+identifiant_bd = ""
 mot_de_passe = tk.StringVar()
 
 # Variable utilisée pour afficher les messages d'information ou d'erreur
@@ -1182,7 +1186,7 @@ def changer_mode_auth():
 
 def envoyer_formulaire_auth():
     # Permet de modifier les variables globales
-    global connecte, page_actuelle
+    global connecte, page_actuelle,identifiant_bd
 
     # Récupère les valeurs des champs obligatoires
     # strip() supprime les espaces au début et à la fin de l'identifiant
@@ -1193,7 +1197,9 @@ def envoyer_formulaire_auth():
     ]
     identifiant_creer=champs_requis[0]
     mdp_creer=champs_requis[1]
-
+    
+    identifiant_bd=champs_requis[0]
+    
     # En mode création de compte, le nom devient obligatoire
     if mode_connexion.get() == "Créer mon compte":
         # Vérifie que tous les champs requis sont remplis

@@ -1,6 +1,6 @@
 import sqlite3
 from hashlib import sha512
-import datetime
+from datetime import datetime
 
 
 connexion = sqlite3.connect("quiz_database.db")
