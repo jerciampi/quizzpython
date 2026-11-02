@@ -1,6 +1,8 @@
 # Importation de la bibliothèque Tkinter pour créer l'interface graphique
+import os
 import tkinter as tk
 from database_quiz import *
+from quiz import obtenir_donnees
 
 
 
@@ -68,6 +70,10 @@ def afficher_page(nom_page):
 
     # Place la page demandée au premier plan
     pages[nom_page].tkraise()
+
+    # Actualise la liste à chaque ouverture de l'onglet Quiz.
+    if nom_page == "Quiz":
+        afficher_liste_quiz()
 
     # Mémorise la page actuellement affichée
     page_actuelle = nom_page
@@ -245,48 +251,18 @@ contenu.pack(fill="both", expand=True)
 # 6. DONNÉES DU QUIZ
 # ============================================================
 
-# Liste contenant toutes les questions du quiz
-# Chaque question est représentée par un dictionnaire avec :
-# - question : le texte de la question
-# - choix : la liste des réponses possibles
-# - reponse : la bonne réponse
-
-questions = [
-    {
-        "question": "Quelle est la capitale de la France ?",
-        "choix": ["Lille", "Annecy", "Paris", "Dunkerque"],
-        "reponse": "Paris",
-    },
-    {
-        "question": "Combien la France a-t-elle de frontières ?",
-        "choix": ["5", "8", "11", "13"],
-        "reponse": "11",
-    },
-    {
-        "question": "Combien y a-t-il de régions en France métropolitaine ?",
-        "choix": ["13", "18", "22", "8"],
-        "reponse": "18",
-    },
-    {
-        "question": "Quelle est la région la plus touristique de France ?",
-        "choix": [
-            "Ile de France",
-            "Provence Alpes Côte d’Azur",
-            "Auvergne Rhône Alpes",
-            "Occitanie",
-        ],
-        "reponse": "Ile de France",
-    },
-]
+# Les questions sont chargées depuis le fichier du quiz sélectionné.
+questions = []
 
 # Liste qui mémorise les réponses de l'utilisateur
 # Chaque position correspond à une question
 # None signifie que la question n'a pas encore de réponse enregistrée
-reponses = [None] * len(questions)
+reponses = []
 
 # Indice de la question actuellement affichée
 # La première question possède l'indice 0
 question_actuelle = 0
+quiz_actuel_id = None
 
 
 # ============================================================
@@ -313,7 +289,7 @@ page_quiz.place(
 # Affichage du titre du quiz
 tk.Label(
     page_quiz,
-    text="Quiz : La France",
+    text="Quiz disponibles",
     bg="#f7f8fc",
     fg="#252633",
     font=("Arial", 25, "bold"),
@@ -322,7 +298,7 @@ tk.Label(
 # Affichage de la description du quiz
 tk.Label(
     page_quiz,
-    text="Répondez aux questions et découvrez votre score.",
+    text="Choisissez un quiz pour commencer.",
     bg="#f7f8fc",
     fg="#686a75",
     font=("Arial", 12),
@@ -354,10 +330,10 @@ intro_quiz = tk.Frame(
     bg="white"
 )
 
-# Affichage du nombre de questions
+# Introduction et liste défilante des quiz disponibles
 tk.Label(
     intro_quiz,
-    text=f"{len(questions)} questions",
+    text="Tous les quiz",
     bg="white",
     fg="#252633",
     font=("Arial", 18, "bold"),
@@ -366,11 +342,51 @@ tk.Label(
 # Instructions destinées à l'utilisateur
 tk.Label(
     intro_quiz,
-    text="Prenez le temps de choisir une réponse à chaque question.",
+    text="Sélectionnez le quiz auquel vous souhaitez jouer.",
     bg="white",
     fg="#686a75",
     font=("Arial", 11),
 ).pack(anchor="w", pady=(8, 18))
+
+zone_liste_quiz = tk.Frame(intro_quiz, bg="white")
+zone_liste_quiz.pack(fill="both", expand=True)
+
+canvas_liste_quiz = tk.Canvas(
+    zone_liste_quiz,
+    bg="white",
+    height=340,
+    highlightthickness=0,
+)
+barre_defilement_quiz = tk.Scrollbar(
+    zone_liste_quiz,
+    orient="vertical",
+    command=canvas_liste_quiz.yview,
+)
+canvas_liste_quiz.configure(yscrollcommand=barre_defilement_quiz.set)
+barre_defilement_quiz.pack(side="right", fill="y")
+canvas_liste_quiz.pack(side="left", fill="both", expand=True)
+
+contenu_liste_quiz = tk.Frame(canvas_liste_quiz, bg="white")
+canvas_liste_quiz.create_window(
+    (0, 0),
+    window=contenu_liste_quiz,
+    anchor="nw",
+    tags="contenu_liste",
+)
+
+contenu_liste_quiz.bind(
+    "<Configure>",
+    lambda _: canvas_liste_quiz.configure(
+        scrollregion=canvas_liste_quiz.bbox("all")
+    ),
+)
+canvas_liste_quiz.bind(
+    "<Configure>",
+    lambda evenement: canvas_liste_quiz.itemconfigure(
+        "contenu_liste",
+        width=evenement.width,
+    ),
+)
 
 
 # -------------------------
@@ -508,6 +524,91 @@ def selectionner_reponse(reponse):
 # 9. AFFICHAGE D'UNE QUESTION
 # ============================================================
 
+def afficher_liste_quiz():
+    # Reconstruit la liste à partir des quiz enregistrés en base.
+    for widget in contenu_liste_quiz.winfo_children():
+        widget.destroy()
+
+    quizs = liste_quiz()
+    if not quizs:
+        tk.Label(
+            contenu_liste_quiz,
+            text="Aucun quiz n'est disponible pour le moment.",
+            bg="white",
+            fg="#686a75",
+            font=("Arial", 11),
+        ).pack(anchor="w", pady=12)
+        return
+
+    for id_quiz, chemin_quiz in quizs:
+        nom_quiz = os.path.splitext(
+            os.path.basename(os.path.normpath(chemin_quiz))
+        )[0]
+        ligne_quiz = tk.Frame(
+            contenu_liste_quiz,
+            bg="#f7f8fc",
+            padx=14,
+            pady=12,
+        )
+        ligne_quiz.pack(fill="x", pady=5)
+
+        tk.Label(
+            ligne_quiz,
+            text=nom_quiz,
+            bg="#f7f8fc",
+            fg="#252633",
+            font=("Arial", 12, "bold"),
+            anchor="w",
+        ).pack(side="left", fill="x", expand=True)
+
+        tk.Button(
+            ligne_quiz,
+            text="Commencer le quiz",
+            command=lambda quiz_id=id_quiz, chemin=chemin_quiz: lancer_quiz(
+                quiz_id, chemin
+            ),
+            bg="#5356f6",
+            fg="white",
+            activebackground="#4245df",
+            relief="flat",
+            padx=14,
+            pady=8,
+            font=("Arial", 10, "bold"),
+            cursor="hand2",
+        ).pack(side="right")
+
+
+def lancer_quiz(id_quiz, chemin_quiz):
+    # Charge les données à l'aide du lecteur existant du module quiz.
+    global questions, reponses, quiz_actuel_id
+
+    questions_brutes, propositions, bonnes_reponses = obtenir_donnees(
+        chemin_quiz
+    )
+    questions = [
+        {
+            "question": question,
+            "choix": choix,
+            "reponse": bonne_reponse,
+        }
+        for question, choix, bonne_reponse in zip(
+            questions_brutes, propositions, bonnes_reponses
+        )
+    ]
+    if not questions:
+        tk.Label(
+            contenu_liste_quiz,
+            text="Ce quiz ne contient aucune question.",
+            bg="white",
+            fg="#b33b3b",
+            font=("Arial", 10),
+        ).pack(anchor="w", pady=6)
+        return
+
+    quiz_actuel_id = id_quiz
+    commencer_quiz()
+
+
 def afficher_question():
     # Récupère les données de la question actuelle
     question = questions[question_actuelle]
@@ -601,7 +702,7 @@ def commencer_quiz():
 # 11. CALCUL ET AFFICHAGE DU SCORE FINAL
 # ============================================================
 
-def terminer_quiz():
+def afficher_resultat():
     global identifiant_bd
     # Calcule le nombre de bonnes réponses
     # zip associe chaque réponse à la question correspondante
@@ -612,7 +713,7 @@ def terminer_quiz():
         for reponse, question in zip(reponses, questions)
     )
     #enregistre dans l'historique
-    enregistrer_partie(identifiant_bd, 1, score)
+    enregistrer_partie(identifiant_bd, quiz_actuel_id, score)
     # Affiche le score obtenu sur le nombre total de questions
     score_final.set(
         f"Votre score : {score} / {len(questions)}"
@@ -635,7 +736,7 @@ def terminer_quiz():
 # 12. PASSAGE À LA QUESTION SUIVANTE
 # ============================================================
 
-def question_suivante():
+def valider_reponse():
     # Permet de modifier l'indice global de la question
     global question_actuelle
 
@@ -654,7 +755,7 @@ def question_suivante():
 
     # Si la dernière question est atteinte, termine le quiz
     if question_actuelle == len(questions) - 1:
-        terminer_quiz()
+        afficher_resultat()
         return
 
     # Passe à la question suivante
@@ -715,7 +816,7 @@ bouton_precedent.pack(side="left")
 bouton_suivant = tk.Button(
     navigation_quiz,
     text="Suivant",
-    command=question_suivante,
+    command=valider_reponse,
     bg="#5356f6",
     fg="white",
     activebackground="#4245df",
@@ -753,11 +854,11 @@ tk.Button(
     cursor="hand2",
 ).pack(side="left", padx=(0, 10))
 
-# Bouton permettant de retourner à l'accueil / menu principal
+# Bouton permettant de revenir à la liste des quiz
 tk.Button(
     zone_boutons_resultat,
-    text="Retour au menu",
-    command=lambda: afficher_page("Accueil"),
+    text="Retour à la liste des quiz",
+    command=lambda: retour_liste_quiz(),
     bg="#eeeeef",
     fg="#454650",
     activebackground="#d5d5d9",
@@ -769,23 +870,16 @@ tk.Button(
 ).pack(side="left")
 
 
-# Bouton permettant de lancer le quiz
-tk.Button(
-    intro_quiz,
-    text="Commencer le quiz",
-    command=commencer_quiz,
-    bg="#5356f6",
-    fg="white",
-    activebackground="#4245df",
-    relief="flat",
-    padx=18,
-    pady=10,
-    font=("Arial", 11, "bold"),
-    cursor="hand2",
-).pack(anchor="w")
-
 # Affichage initial de l'écran d'introduction
 intro_quiz.pack(fill="x")
+
+
+def retour_liste_quiz():
+    # Réaffiche la liste et masque les vues de jeu et de résultat.
+    zone_questions.pack_forget()
+    resultat_quiz.pack_forget()
+    intro_quiz.pack(fill="x")
+    afficher_liste_quiz()
 
 
 # La page Quiz est conservée telle qu'elle a été construite.
@@ -1312,4 +1406,3 @@ pages["Connexion"].tkraise()
 # Elle maintient la fenêtre ouverte et gère les clics,
 # les saisies et les autres événements de l'interface
 fenetre.mainloop()
-

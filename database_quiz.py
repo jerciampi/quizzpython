@@ -235,6 +235,7 @@ def liste_nom_quiz():
           liste_nom_quiz.append(nom_quiz)
 
   return liste_nom_quiz
+print(liste_nom_quiz())
 
 
 def afficher_tous_les_comptes():
