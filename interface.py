@@ -1,6 +1,6 @@
 # Importation de la bibliothèque Tkinter pour créer l'interface graphique
 import tkinter as tk
-from database_quiz import verifier_connexion,enregistrer_partie,creer_compte
+from database_quiz import *
 
 
 
@@ -239,99 +239,6 @@ contenu = tk.Frame(
 # La zone de contenu occupe tout l'espace disponible
 contenu.pack(fill="both", expand=True)
 
-
-# ============================================================
-# 5. CRÉATION DES PAGES ACCUEIL ET MES ACTIVITÉS
-# ============================================================
-
-# Chaque élément contient :
-# - le nom interne de la page
-# - le titre affiché
-# - une description
-# - un message dans la carte centrale
-# Variable dynamique pour personnaliser le titre de la page d'accueil
-titre_accueil = tk.StringVar(value="Bienvenue sur SQuizi !")
-
-for nom_page, titre, description, message in (
-    (
-        "Accueil",
-        "Bienvenue sur SQuizi !",
-        "Votre espace pour apprendre en vous amusant.",
-        "Est-ce que c'est bon pour vous ?",
-    ),
-    (
-        "Mes activités",
-        "Mes activités",
-        "Retrouvez ici votre progression et vos résultats.",
-        "Vous n’avez pas encore d’activité.",
-    ),
-):
-
-    # Création du conteneur de la page
-    page = tk.Frame(
-        contenu,
-        bg="#f7f8fc"
-    )
-
-    # Affichage du titre de la page
-    # Le titre de l'accueil est dynamique et pourra afficher l'identifiant saisi
-    if nom_page == "Accueil":
-        tk.Label(
-            page,
-            textvariable=titre_accueil,
-            bg="#f7f8fc",
-            fg="#252633",
-            font=("Arial", 25, "bold"),
-        ).pack(anchor="w")
-    else:
-        tk.Label(
-            page,
-            text=titre,
-            bg="#f7f8fc",
-            fg="#252633",
-            font=("Arial", 25, "bold"),
-        ).pack(anchor="w")
-
-    # Affichage de la description sous le titre
-    tk.Label(
-        page,
-        text=description,
-        bg="#f7f8fc",
-        fg="#686a75",
-        font=("Arial", 12),
-    ).pack(anchor="w", pady=(8, 28))
-
-    # Création d'une carte blanche contenant le message
-    carte = tk.Frame(
-        page,
-        bg="white",
-        padx=24,
-        pady=24
-    )
-
-    # Affichage de la carte sur toute la largeur disponible
-    carte.pack(fill="x")
-
-    # Affichage du message de la carte
-    tk.Label(
-        carte,
-        text=message,
-        bg="white",
-        fg="#686a75",
-        font=("Arial", 12),
-    ).pack(anchor="w")
-
-    # Enregistrement de la page dans le dictionnaire
-    pages[nom_page] = page
-
-    # Superposition de la page avec les autres pages
-    # relwidth et relheight lui donnent toute la zone de contenu
-    page.place(
-        relx=0,
-        rely=0,
-        relwidth=1,
-        relheight=1
-    )
 
 
 # ============================================================
@@ -1264,11 +1171,108 @@ def envoyer_formulaire_auth():
 
     # Réinitialise la page actuellement sélectionnée
     page_actuelle = None
-
+    titre_accueil = tk.StringVar(value="Bienvenue sur SQuizi !")
     # Met à jour le titre de l'accueil avec l'identifiant saisi
     titre_accueil.set(
         f"Bienvenue sur SQuizi, {identifiant.get().strip()} !"
     )
+    # ============================================================
+    # 5. CRÉATION DES PAGES ACCUEIL ET MES ACTIVITÉS
+    # ============================================================
+
+    # Chaque élément contient :
+    # - le nom interne de la page
+    # - le titre affiché
+    # - une description
+    # - un message dans la carte centrale
+    # Variable dynamique pour personnaliser le titre de la page d'accueil
+    
+    historique = obtenir_historique(identifiant_bd)
+    historique_afficher=""
+    for k in historique:
+        historique_afficher+=k+"\n\n"
+    for nom_page, titre, description, message in (
+        (
+            "Accueil",
+            "Bienvenue sur SQuizi !",
+            "Votre espace pour apprendre en vous amusant.",
+            "Est-ce que c'est bon pour vous ?",
+        ),
+        (
+            "Mes activités",
+            "Mes activités",
+            "Retrouvez ici votre progression et vos résultats.",
+            #mettre les valeurs de historique
+            historique_afficher,
+        ),
+    ):
+
+        # Création du conteneur de la page
+        page = tk.Frame(
+            contenu,
+            bg="#f7f8fc"
+        )
+
+        # Affichage du titre de la page
+        # Le titre de l'accueil est dynamique et pourra afficher l'identifiant saisi
+        if nom_page == "Accueil":
+            tk.Label(
+                page,
+                textvariable=titre_accueil,
+                bg="#f7f8fc",
+                fg="#252633",
+                font=("Arial", 25, "bold"),
+            ).pack(anchor="w")
+        else:
+            tk.Label(
+                page,
+                text=titre,
+                bg="#f7f8fc",
+                fg="#252633",
+                font=("Arial", 25, "bold"),
+            ).pack(anchor="w")
+
+        # Affichage de la description sous le titre
+        tk.Label(
+            page,
+            text=description,
+            bg="#f7f8fc",
+            fg="#686a75",
+            font=("Arial", 12),
+        ).pack(anchor="w", pady=(8, 28))
+
+        # Création d'une carte blanche contenant le message
+        carte = tk.Frame(
+            page,
+            bg="white",
+            padx=24,
+            pady=24
+        )
+
+        # Affichage de la carte sur toute la largeur disponible
+        carte.pack(fill="x")
+
+        # Affichage du message de la carte
+        tk.Label(
+            carte,
+            text=message,
+            bg="white",
+            fg="#686a75",
+            font=("Arial", 12),
+        ).pack(anchor="w")
+
+        # Enregistrement de la page dans le dictionnaire
+        pages[nom_page] = page
+
+        # Superposition de la page avec les autres pages
+        # relwidth et relheight lui donnent toute la zone de contenu
+        page.place(
+            relx=0,
+            rely=0,
+            relwidth=1,
+            relheight=1
+        )
+
 
     # Redirige l'utilisateur vers la page d'accueil
     afficher_page("Accueil")

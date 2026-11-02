@@ -207,13 +207,35 @@ def liste_quiz():
           chemin_quiz = q[1]  # Contient le chemin (ex: "fichier.txt")
           
           # On extrait le nom du fichier sans l'extension
-          nom_quiz = os.path.splitext(os.path.basename(chemin_quiz))[0]
+          nom_quiz = chemin_quiz.split("/")[-1]
                 
           print(f"ID Quiz : {id_q} | Nom du Quiz : {nom_quiz}")
   else:
      print("\n[Info] Aucun quiz n'est enregistré dans la base de données pour l'instant.")
 
   return quizs
+
+def liste_nom_quiz():
+  """Affiche la liste des quizs."""
+  connexion = sqlite3.connect("quiz_database.db")
+  curseur = connexion.cursor()
+
+  curseur.execute("SELECT id_quiz, fiche_quiz FROM Quiz")
+  quizs = curseur.fetchall()
+  liste_nom_quiz=[]
+  connexion.close()
+
+  if quizs:
+      for q in quizs:
+          id_q = q[0]
+          chemin_quiz = q[1]  # Contient le chemin (ex: "fichier.txt")
+          
+          # On extrait le nom du fichier sans l'extension
+          nom_quiz = chemin_quiz.split("/")[-1]
+          liste_nom_quiz.append(nom_quiz)
+
+  return liste_nom_quiz
+
 
 def afficher_tous_les_comptes():
     connexion = sqlite3.connect("quiz_database.db")
@@ -361,3 +383,5 @@ def menu_console():
 
     else:
       print("\n[Erreur] Choix invalide, veuillez choisir entre 1, 2, 3, 4, 5, 6 et 7.")
+
+
