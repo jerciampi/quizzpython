@@ -1,6 +1,5 @@
 # Importation de la bibliothèque Tkinter pour créer l'interface graphique
 import tkinter as tk
-from PIL import Image, ImageTk
 from database_quiz import verifier_connexion,enregistrer_partie,creer_compte
 
 
@@ -828,9 +827,13 @@ bouton_suivant.pack(side="right")
 # 15. BOUTONS DE L'ÉCRAN DES RÉSULTATS ET D'INTRODUCTION
 # ============================================================
 
+# Conteneur horizontal pour aligner les boutons sur l'écran des résultats
+zone_boutons_resultat = tk.Frame(resultat_quiz, bg="white")
+zone_boutons_resultat.pack(anchor="w")
+
 # Bouton permettant de recommencer le quiz depuis le début
 tk.Button(
-    resultat_quiz,
+    zone_boutons_resultat,
     text="Recommencer",
     command=commencer_quiz,
     bg="#5356f6",
@@ -841,7 +844,22 @@ tk.Button(
     pady=9,
     font=("Arial", 10, "bold"),
     cursor="hand2",
-).pack(anchor="w")
+).pack(side="left", padx=(0, 10))
+
+# Bouton permettant de retourner à l'accueil / menu principal
+tk.Button(
+    zone_boutons_resultat,
+    text="Retour au menu",
+    command=lambda: afficher_page("Accueil"),
+    bg="#eeeeef",
+    fg="#454650",
+    activebackground="#d5d5d9",
+    relief="flat",
+    padx=18,
+    pady=9,
+    font=("Arial", 10),
+    cursor="hand2",
+).pack(side="left")
 
 
 # Bouton permettant de lancer le quiz

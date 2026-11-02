@@ -29,6 +29,8 @@ def poser_quiz(nom):
         if poser_question(questions[i], propositions[i], reponses[i]):
             bonnes_reponses += 1
     print(f"Score final : {bonnes_reponses} bonne(s) réponse(s) sur {len(questions)}")
+
+    
     
 def poser_question(quest, props, reps):
     print(quest)

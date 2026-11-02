@@ -174,14 +174,13 @@ def ajouter_quiz_depuis_fichier(chemin_fichier):
         connexion = sqlite3.connect("quiz_database.db")
         curseur = connexion.cursor()
 
-        texte_a_inserer = f"TITRE:{nom_quiz}\n{contenu_texte}"
 
         curseur.execute(
             """
             INSERT INTO Quiz (fiche_quiz)
             VALUES (?)
             """,
-            (texte_a_inserer,),
+            (chemin_fichier,),
         )
         
         connexion.commit()
@@ -205,12 +204,10 @@ def liste_quiz():
       print("\n--- LISTE DES QUIZS DISPONIBLES ---")
       for q in quizs:
           id_q = q[0]
-          contenu_complet = q[1]  
-          premiere_ligne = contenu_complet.splitlines()[0] if contenu_complet else ""  
-          if premiere_ligne.startswith("TITRE:"):
-            nom_quiz = premiere_ligne.replace("TITRE:", "")
-          else:
-            nom_quiz = "Quiz sans nom"
+          chemin_quiz = q[1]  # Contient le chemin (ex: "fichier.txt")
+          
+          # On extrait le nom du fichier sans l'extension
+          nom_quiz = os.path.splitext(os.path.basename(chemin_quiz))[0]
                 
           print(f"ID Quiz : {id_q} | Nom du Quiz : {nom_quiz}")
   else:
@@ -219,7 +216,7 @@ def liste_quiz():
   return quizs
 
 def afficher_tous_les_comptes():
-    connexion = sqlite3.connect(DB_NAME)
+    connexion = sqlite3.connect("quiz_database.db")
     curseur = connexion.cursor()
 
     curseur.execute(
@@ -261,6 +258,38 @@ def ajouter_historique(identifiant, id_quiz, score):
     connexion.commit()
     connexion.close()
     print("Partie enregistrée dans l'historique avec succès !")
+
+def obtenir_historique(identifiant):
+    """Récupère l'historique et renvoie chaque ligne sous forme de chaîne de caractères formatée."""
+    connexion = sqlite3.connect("quiz_database.db")
+    curseur = connexion.cursor()
+
+    curseur.execute(
+        """
+        SELECT h.id_hist, h.score, h.date, h.heure, h.id_quiz , Quiz.fiche_quiz
+        FROM Historique h
+        JOIN Quiz ON h.id_quiz = Quiz.id_quiz
+        WHERE h.identifiant = ?
+        ORDER BY h.date DESC, h.heure DESC
+
+        """,
+        (identifiant,),
+    )
+    
+    historique_utilisateur = curseur.fetchall()
+    connexion.close()
+
+    liste_chaines = []
+    
+    for h in historique_utilisateur:
+        id_hist, score, date, heure, id_quiz, fiche_quiz = h
+        nom_quiz = fiche_quiz.split("/")[-1]
+        texte_partie = f'Quiz : {nom_quiz} | le score est de {score} réalisé à {heure} le {date}'
+        liste_chaines.append(texte_partie)
+
+    return liste_chaines
+
+   
 
 def menu_console():
   while True:
