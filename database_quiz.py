@@ -386,3 +386,4 @@ def menu_console():
       print("\n[Erreur] Choix invalide, veuillez choisir entre 1, 2, 3, 4, 5, 6 et 7.")
 
 
+
