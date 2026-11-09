@@ -315,6 +315,24 @@ def obtenir_historique(identifiant):
 
     return liste_chaines
 
+def obtenir_leaderboard_quiz(id_quiz):
+    """Récupère les scores enregistrés pour un quiz donné, du plus grand au plus petit."""
+    connexion = sqlite3.connect("quiz_database.db")
+    curseur = connexion.cursor()
+
+    curseur.execute(
+        """
+        SELECT Compte.identifiant, Historique.score, Historique.chronometre, Historique.date
+        FROM Historique
+        JOIN Compte ON Historique.identifiant = Compte.identifiant
+        WHERE Historique.id_quiz = ?
+        ORDER BY Historique.score DESC, Historique.chronometre ASC
+        """,
+        (id_quiz,),
+    )
+    resultats = curseur.fetchall()
+    connexion.close()
+    return resultats
    
 
 def menu_console():

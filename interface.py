@@ -80,6 +80,9 @@ def afficher_page(nom_page):
     if nom_page == "Quiz":
         afficher_liste_quiz()
 
+    if nom_page == "Leaderboard":
+        afficher_liste_quiz_leaderboard()
+
     # Mémorise la page actuellement affichée
     page_actuelle = nom_page
 
@@ -182,7 +185,7 @@ navigation = tk.Frame(
 navigation.pack(side="left", fill="y")
 
 # Création des boutons Quiz et Mes activités
-for nom_page in ("Quiz", "Mes activités","Créer un quiz"):
+for nom_page in ("Quiz", "Mes activités","Leaderboard","Créer un quiz"):
 
     # Création d'un bouton pour chaque page
     bouton = tk.Button(
@@ -251,11 +254,80 @@ contenu = tk.Frame(
     padx=48,
     pady=38
 )
-
-# La zone de contenu occupe tout l'espace disponible
 contenu.pack(fill="both", expand=True)
 
+# ============================================================
+# 4.5 PAGE DU LEADERBOARD
+# ============================================================
+# La zone de contenu occupe tout l'espace disponible
+def afficher_details_leaderboard(id_quiz, nom_quiz):
+    scores = obtenir_leaderboard_quiz(id_quiz)
+    
+    fenetre_lb = tk.Toplevel(fenetre)
+    fenetre_lb.title(f"Leaderboard - {nom_quiz}")
+    fenetre_lb.geometry("450x400")
+    fenetre_lb.configure(bg="#f7f8fc")
 
+    tk.Label(fenetre_lb, text=f"Classement : {nom_quiz}", bg="#f7f8fc", font=("Arial", 16, "bold")).pack(pady=15)
+
+    if not scores:
+        tk.Label(fenetre_lb, text="Aucun score enregistré pour ce quiz.", bg="#f7f8fc", fg="#686a75").pack(pady=20)
+        return
+
+    for idx, (utilisateur, score, chrono, date) in enumerate(scores, 1):
+        texte_ligne = f"{idx}. {utilisateur} — Score : {score} (Temps : {chrono}s) le {date}"
+        tk.Label(fenetre_lb, text=texte_ligne, bg="white", font=("Arial", 11), padx=10, pady=5).pack(fill="x", padx=20, pady=2)
+
+def afficher_liste_quiz_leaderboard():
+    # Reconstruit la liste à partir des quiz enregistrés en base.
+    for widget in contenu_liste_lb.winfo_children():
+        widget.destroy()
+
+    quizs = liste_quiz()
+    if not quizs:
+        tk.Label(
+            contenu_liste_lb,
+            text="Aucun quiz n'est disponible pour le moment.",
+            bg="white",
+            fg="#686a75",
+            font=("Arial", 11),
+        ).pack(anchor="w", pady=12)
+        return
+
+    for id_quiz, chemin_quiz in quizs:
+        nom_quiz = os.path.splitext(
+            os.path.basename(os.path.normpath(chemin_quiz))
+        )[0]
+        ligne_leaderboard = tk.Frame(
+            contenu_liste_lb,
+            bg="#f7f8fc",
+            padx=14,
+            pady=12,
+        )
+        ligne_leaderboard.pack(fill="x", pady=5)
+
+        tk.Label(
+            ligne_leaderboard,
+            text=nom_quiz,
+            bg="#f7f8fc",
+            fg="#252633",
+            font=("Arial", 12, "bold"),
+            anchor="w",
+        ).pack(side="left", fill="x", expand=True)
+
+        tk.Button(
+            ligne_leaderboard,
+            text="Voir le leaderboard",
+            command=lambda quiz_id=id_quiz, chemin=chemin_quiz: afficher_details_leaderboard(quiz_id, nom_quiz),
+            bg="#5356f6",
+            fg="white",
+            activebackground="#4245df",
+            relief="flat",
+            padx=14,
+            pady=8,
+            font=("Arial", 10, "bold"),
+            cursor="hand2",
+        ).pack(side="right")
 
 # ============================================================
 # 6. DONNÉES DU QUIZ & CHRONOMÈTRE
@@ -273,6 +345,130 @@ temps_ecoule = 0
 temps_final = 0
 chronometre_id = None
 
+# ============================================================
+# 7.1 CRÉATION DE LA PAGE DU QUIZ
+# ============================================================
+
+# Création du conteneur principal de la page Quiz
+page_leaderboard = tk.Frame(
+    contenu,
+    bg="#f7f8fc"
+)
+
+# Enregistrement de la page dans le dictionnaire
+pages["Leaderboard"] = page_leaderboard
+
+# Positionnement de la page dans la zone de contenu
+page_leaderboard.place(
+    relx=0,
+    rely=0,
+    relwidth=1,
+    relheight=1
+)
+
+# Affichage du titre de la page
+tk.Label(
+    page_leaderboard,
+    text="Leaderboard disponibles",
+    bg="#f7f8fc",
+    fg="#252633",
+    font=("Arial", 25, "bold"),
+).pack(anchor="w")
+
+# Affichage de la description du quiz
+tk.Label(
+    page_leaderboard,
+    text="Choisissez le leaderboard du quiz souhaité.",
+    bg="#f7f8fc",
+    fg="#686a75",
+    font=("Arial", 12),
+).pack(anchor="w", pady=(8, 28))
+
+
+# -------------------------
+# Carte principale du quiz
+# -------------------------
+
+# Création de la carte blanche qui contient le quiz
+carte_leaderboard = tk.Frame(
+    page_leaderboard,
+    bg="white",
+    padx=24,
+    pady=24
+)
+
+carte_leaderboard.pack(fill="x")
+
+
+# -------------------------
+# Écran d'introduction
+# -------------------------
+
+# Conteneur affiché avant le début du quiz
+intro_leaderboard = tk.Frame(
+    carte_leaderboard,
+    bg="white"
+)
+
+# Introduction et liste défilante des quiz disponibles
+tk.Label(
+    intro_leaderboard,
+    text="Tous les leaderboards",
+    bg="white",
+    fg="#252633",
+    font=("Arial", 18, "bold"),
+).pack(anchor="w")
+
+# Instructions destinées à l'utilisateur
+tk.Label(
+    intro_leaderboard,
+    text="Sélectionnez le leaderboard que vous souhaitez consulter",
+    bg="white",
+    fg="#686a75",
+    font=("Arial", 11),
+).pack(anchor="w", pady=(8, 18))
+
+zone_liste_lb = tk.Frame(intro_leaderboard, bg="white")
+zone_liste_lb.pack(fill="both", expand=True)
+
+canvas_liste_lb = tk.Canvas(
+    zone_liste_lb,
+    bg="white",
+    height=340,
+    highlightthickness=0,
+)
+barre_defilement_lb = tk.Scrollbar(
+    zone_liste_lb,
+    orient="vertical",
+    command=canvas_liste_lb.yview,
+)
+canvas_liste_lb.configure(yscrollcommand=barre_defilement_lb.set)
+barre_defilement_lb.pack(side="right", fill="y")
+canvas_liste_lb.pack(side="left", fill="both", expand=True)
+
+contenu_liste_lb = tk.Frame(canvas_liste_lb, bg="white")
+canvas_liste_lb.create_window(
+    (0, 0),
+    window=contenu_liste_lb,
+    anchor="nw",
+    tags="contenu_liste",
+)
+
+contenu_liste_lb.bind(
+    "<Configure>",
+    lambda _: canvas_liste_lb.configure(
+        scrollregion=canvas_liste_lb.bbox("all")
+    ),
+)
+canvas_liste_lb.bind(
+    "<Configure>",
+    lambda evenement: canvas_liste_lb.itemconfigure(
+        "contenu_liste",
+        width=evenement.width,
+    ),
+)
+intro_leaderboard.pack(fill="x")
+afficher_liste_quiz_leaderboard()
 
 # ============================================================
 # 7. CRÉATION DE LA PAGE DU QUIZ
@@ -1331,7 +1527,7 @@ def envoyer_formulaire_auth():
         f"Bienvenue sur SQuizi, {identifiant.get().strip()} !"
     )
     # ============================================================
-    # 5. CRÉATION DES PAGES ACCUEIL ET MES ACTIVITÉS
+    # CRÉATION DES PAGES ACCUEIL ET MES ACTIVITÉS
     # ============================================================
 
     # Chaque élément contient :
