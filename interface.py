@@ -3,6 +3,7 @@ import os
 import tkinter as tk
 from database_quiz import *
 from quiz import obtenir_donnees
+import time
 
 
 
@@ -51,6 +52,10 @@ def afficher_page(nom_page):
     if not connecte:
         return
 
+    # Si on quitte la page Quiz, on arrête le chronomètre pour éviter qu'il tourne en fond
+    if page_actuelle == "Quiz":
+        arreter_chronometre()
+
     # Évite de réafficher une page déjà ouverte
     if page_actuelle == nom_page:
         return
@@ -82,6 +87,8 @@ def afficher_page(nom_page):
 def se_deconnecter():
     # Permet de modifier les variables globales
     global connecte, page_actuelle
+
+    arreter_chronometre()
 
     # Indique que l'utilisateur n'est plus connecté
     connecte = False
@@ -248,21 +255,20 @@ contenu.pack(fill="both", expand=True)
 
 
 # ============================================================
-# 6. DONNÉES DU QUIZ
+# 6. DONNÉES DU QUIZ & CHRONOMÈTRE
 # ============================================================
 
 # Les questions sont chargées depuis le fichier du quiz sélectionné.
 questions = []
-
-# Liste qui mémorise les réponses de l'utilisateur
-# Chaque position correspond à une question
-# None signifie que la question n'a pas encore de réponse enregistrée
 reponses = []
-
-# Indice de la question actuellement affichée
-# La première question possède l'indice 0
 question_actuelle = 0
 quiz_actuel_id = None
+
+# Variables pour le chronomètre (part de 0 et max 1 heure = 3600 secondes)
+TEMPS_MAX_QUIZ = 3600
+temps_ecoule = 0
+temps_final = 0
+chronometre_id = None
 
 
 # ============================================================
@@ -390,27 +396,36 @@ canvas_liste_quiz.bind(
 
 
 # -------------------------
-# Zone des questions
+# Zone des questions & Entête avec Chrono
 # -------------------------
 
-# Conteneur affichant les questions pendant le quiz
 zone_questions = tk.Frame(
     carte_quiz,
     bg="white"
 )
 
-# Variable dynamique affichant la progression du quiz
-progression = tk.StringVar()
+entete_quiz_frame = tk.Frame(zone_questions, bg="white")
+entete_quiz_frame.pack(fill="x", pady=(0, 10))
 
+progression = tk.StringVar()
 tk.Label(
-    zone_questions,
+    entete_quiz_frame,
     textvariable=progression,
     bg="white",
     fg="#5356f6",
     font=("Arial", 10, "bold"),
-).pack(anchor="w")
+).pack(side="left")
 
-# Label qui affichera le texte de la question actuelle
+# Label visuel du chronomètre pendant le quiz
+texte_chronometre = tk.StringVar()
+tk.Label(
+    entete_quiz_frame,
+    textvariable=texte_chronometre,
+    bg="white",
+    fg="#686a75",
+    font=("Arial", 10, "bold"),
+).pack(side="right")
+
 libelle_question = tk.Label(
     zone_questions,
     bg="white",
@@ -419,23 +434,17 @@ libelle_question = tk.Label(
     wraplength=720,
     justify="left",
 )
-
 libelle_question.pack(anchor="w", pady=(14, 18))
 
-# Variable qui mémorise le choix sélectionné par l'utilisateur
 choix_selectionne = tk.StringVar()
 
-# Conteneur dans lequel seront créés les boutons de réponse
 zone_choix = tk.Frame(
     zone_questions,
     bg="white"
 )
-
 zone_choix.pack(fill="x")
 
-# Variable permettant d'afficher un message d'erreur
 statut_quiz = tk.StringVar()
-
 tk.Label(
     zone_questions,
     textvariable=statut_quiz,
@@ -444,12 +453,10 @@ tk.Label(
     font=("Arial", 10),
 ).pack(anchor="w", pady=(10, 0))
 
-# Conteneur des boutons Précédent et Suivant
 navigation_quiz = tk.Frame(
     zone_questions,
     bg="white"
 )
-
 navigation_quiz.pack(fill="x", pady=(18, 0))
 
 
@@ -457,15 +464,12 @@ navigation_quiz.pack(fill="x", pady=(18, 0))
 # Écran des résultats
 # -------------------------
 
-# Conteneur affiché à la fin du quiz
 resultat_quiz = tk.Frame(
     carte_quiz,
     bg="white"
 )
 
-# Variable dynamique contenant le score final
 score_final = tk.StringVar()
-
 tk.Label(
     resultat_quiz,
     textvariable=score_final,
@@ -474,16 +478,24 @@ tk.Label(
     font=("Arial", 21, "bold"),
 ).pack(anchor="w")
 
-# Variable dynamique contenant le message de résultat
-message_resultat = tk.StringVar()
+# Variable et Label pour afficher le temps sur l'écran des résultats
+temps_resultat_str = tk.StringVar()
+tk.Label(
+    resultat_quiz,
+    textvariable=temps_resultat_str,
+    bg="white",
+    fg="#5356f6",
+    font=("Arial", 12, "bold"),
+).pack(anchor="w", pady=(4, 8))
 
+message_resultat = tk.StringVar()
 tk.Label(
     resultat_quiz,
     textvariable=message_resultat,
     bg="white",
     fg="#686a75",
     font=("Arial", 12),
-).pack(anchor="w", pady=(8, 18))
+).pack(anchor="w", pady=(0, 18))
 
 
 # ============================================================
@@ -518,6 +530,37 @@ def selectionner_reponse(reponse):
 
     # Actualise l'apparence des boutons
     actualiser_selection_choix()
+
+
+# ============================================================
+# 8.5. GESTION DU CHRONOMÈTRE (COMPTEUR UP DE 0)
+# ============================================================
+
+def demarrer_chronometre():
+    global temps_ecoule, chronometre_id
+    temps_ecoule = 0
+    mettre_a_jour_chrono()
+
+def mettre_a_jour_chrono():
+    global temps_ecoule, chronometre_id
+    if temps_ecoule < TEMPS_MAX_QUIZ:
+        minutes = temps_ecoule // 60
+        secondes = temps_ecoule % 60
+        texte_chronometre.set(f"⏱️ Temps : {minutes:02d}:{secondes:02d}")
+        temps_ecoule += 1
+        # Relance la fonction dans exactement 1 seconde (1000 millisecondes)
+        chronometre_id = fenetre.after(1000, mettre_a_jour_chrono)
+    else:
+        # Limite maximale d'une heure atteinte : validation automatique
+        texte_chronometre.set("⏱️ 1h max atteinte !")
+        statut_quiz.set("La limite de temps d'une heure a été atteinte.")
+        afficher_resultat()
+
+def arreter_chronometre():
+    global chronometre_id
+    if chronometre_id is not None:
+        fenetre.after_cancel(chronometre_id)
+        chronometre_id = None
 
 
 # ============================================================
@@ -694,41 +737,53 @@ def commencer_quiz():
     # Affiche la zone contenant les questions
     zone_questions.pack(fill="x")
 
+    # Démarrage du chronomètre
+    demarrer_chronometre()
+
     # Affiche la première question
     afficher_question()
 
 
 # ============================================================
-# 11. CALCUL ET AFFICHAGE DU SCORE FINAL
+# 11. CALCUL ET AFFICHAGE DU SCORE FINAL & STOCKAGE DU TEMPS
 # ============================================================
 
 def afficher_resultat():
-    global identifiant_bd
-    # Calcule le nombre de bonnes réponses
-    # zip associe chaque réponse à la question correspondante
-    # La comparaison renvoie True si la réponse est correcte
-    # En Python, True vaut 1 et False vaut 0
+    global identifiant_bd, temps_final
+    
+    # Arrêt du chronomètre et stockage du temps final en secondes
+    arreter_chronometre()
+    temps_final = max(0, temps_ecoule - 1)
+
+    # Formatage du temps
+    mins = temps_final // 60
+    secs = temps_final % 60
+    secs2 = temps_final
+    
+    # 1. La string pure pour la base de données (ex: "02:15")
+    temps_sql = f"{secs2:02d}"  
+
+    # 2. Mise à jour de l'affichage visuel sur l'écran de fin
+    temps_resultat_str.set(f"⏱️ Temps réalisé : {mins:02d} min {secs:02d} s")
+
     score = sum(
         reponse == question["reponse"]
         for reponse, question in zip(reponses, questions)
     )
-    #enregistre dans l'historique
-    enregistrer_partie(identifiant_bd, quiz_actuel_id, score)
-    # Affiche le score obtenu sur le nombre total de questions
+    
+    # Enregistrement dans l'historique en passant la string du temps
+    enregistrer_partie(identifiant_bd, quiz_actuel_id, score, temps_sql)
+    
     score_final.set(
         f"Votre score : {score} / {len(questions)}"
     )
 
-    # Affiche un message selon le résultat obtenu
     message_resultat.set(
         "Excellent travail !" if score == len(questions)
         else "Vous pouvez recommencer pour améliorer votre score."
     )
 
-    # Masque la zone des questions
     zone_questions.pack_forget()
-
-    # Affiche l'écran des résultats
     resultat_quiz.pack(fill="x")
 
 
@@ -875,6 +930,7 @@ intro_quiz.pack(fill="x")
 
 
 def retour_liste_quiz():
+    arreter_chronometre()
     # Réaffiche la liste et masque les vues de jeu et de résultat.
     zone_questions.pack_forget()
     resultat_quiz.pack_forget()

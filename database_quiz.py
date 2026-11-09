@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS Historique (
     score INTEGER NOT NULL,
     date TEXT NOT NULL,
     heure TEXT NOT NULL,
+    chronometre TEXT,
     identifiant TEXT,
     id_quiz INTEGER,
     FOREIGN KEY (identifiant) REFERENCES Compte(identifiant) ON DELETE CASCADE,
@@ -107,7 +108,7 @@ def verifier_connexion(identifiant, mdp_en_clair):
         print(f"Erreur : L'identifiant '{identifiant}' n'existe pas.")
         return False, None
 
-def enregistrer_partie(identifiant, id_quiz, score):
+def enregistrer_partie(identifiant, id_quiz, score, chronometre):
   """Enregistre le score dans l'historique et met à jour le hscore si besoin."""
   connexion = sqlite3.connect("quiz_database.db")
   curseur = connexion.cursor()
@@ -120,10 +121,10 @@ def enregistrer_partie(identifiant, id_quiz, score):
   # 1. Insertion dans la table Historique
   curseur.execute(
       """
-        INSERT INTO Historique (score, date, heure, identifiant, id_quiz)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO Historique (score, date, heure, chronometre, identifiant, id_quiz)
+        VALUES (?, ?, ?, ?, ?, ?)
     """,
-      (score, date_jour, heure_actuelle, identifiant, id_quiz),
+      (score, date_jour, heure_actuelle, chronometre, identifiant, id_quiz),
   )
 
   # 2. Vérifier et mettre à jour le meilleur score (hscore) de l'utilisateur
@@ -289,7 +290,7 @@ def obtenir_historique(identifiant):
 
     curseur.execute(
         """
-        SELECT h.id_hist, h.score, h.date, h.heure, h.id_quiz , Quiz.fiche_quiz
+        SELECT h.id_hist, h.score, h.date, h.heure, h.chronometre, h.id_quiz , Quiz.fiche_quiz
         FROM Historique h
         JOIN Quiz ON h.id_quiz = Quiz.id_quiz
         WHERE h.identifiant = ?
@@ -305,9 +306,11 @@ def obtenir_historique(identifiant):
     liste_chaines = []
     
     for h in historique_utilisateur:
-        id_hist, score, date, heure, id_quiz, fiche_quiz = h
+        id_hist, score, date, heure, chronometre, id_quiz, fiche_quiz = h
         nom_quiz = fiche_quiz.split("/")[-1]
-        texte_partie = f'Quiz : {nom_quiz} | le score est de {score} réalisé à {heure} le {date}'
+        mins = chronometre // 60
+        secs = chronometre % 60
+        texte_partie = f'Quiz : {nom_quiz} | le score est de {score} en {mins:02d}min{secs:02d}s secondes réalisé à {heure} le {date}'
         liste_chaines.append(texte_partie)
 
     return liste_chaines
@@ -383,13 +386,13 @@ def menu_console():
     else:
       print("\n[Erreur] Choix invalide, veuillez choisir entre 1, 2, 3, 4, 5, 6 et 7.")
 
-# connexion = sqlite3.connect("quiz_database.db")
-# curseur = connexion.cursor()
-# curseur.execute(
-#     """UPDATE Compte SET admin = 1 WHERE identifiant = 'admin';""",
-# )
-# connexion.commit()
-# connexion.close()
+#connexion = sqlite3.connect("quiz_database.db")
+#curseur = connexion.cursor() 
+#curseur.execute(
+#     """UPDATE Historique SET chronometre = 120 WHERE chronometre IS NULL;""",
+#)
+#connexion.commit()
+#connexion.close()
       
 
 
