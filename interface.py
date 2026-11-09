@@ -275,7 +275,9 @@ def afficher_details_leaderboard(id_quiz, nom_quiz):
         return
 
     for idx, (utilisateur, score, chrono, date) in enumerate(scores, 1):
-        texte_ligne = f"{idx}. {utilisateur} — Score : {score} (Temps : {chrono}s) le {date}"
+        mins = chrono // 60
+        secs = chrono % 60
+        texte_ligne = f"{idx}. {utilisateur} — Score : {score} (Temps : {mins:02d}min{secs:02d}s) le {date}"
         tk.Label(fenetre_lb, text=texte_ligne, bg="white", font=("Arial", 11), padx=10, pady=5).pack(fill="x", padx=20, pady=2)
 
 def afficher_liste_quiz_leaderboard():
@@ -318,7 +320,7 @@ def afficher_liste_quiz_leaderboard():
         tk.Button(
             ligne_leaderboard,
             text="Voir le leaderboard",
-            command=lambda quiz_id=id_quiz, chemin=chemin_quiz: afficher_details_leaderboard(quiz_id, nom_quiz),
+            command=lambda quiz_id=id_quiz, n_quiz=nom_quiz: afficher_details_leaderboard(quiz_id, n_quiz),
             bg="#5356f6",
             fg="white",
             activebackground="#4245df",
