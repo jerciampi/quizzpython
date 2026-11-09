@@ -347,17 +347,16 @@ def menu_console():
         print(f"\n[Succès] Bienvenue {identifiant} !")
         if admin == 1:
           print("-> Vous êtes connecté en tant qu'Administrateur.")
-          # TODO: Appeler ici le menu de création de quiz plus tard
+          
         else:
           print("-> Vous êtes connecté en tant qu'Utilisateur classique.")
-          # TODO: Appeler ici le menu pour jouer à un quiz plus tard
+          
 
     elif choix == "3":
       connexion_temp = sqlite3.connect("quiz_database.db")
       curseur_temp = connexion_temp.cursor()
 
       curseur_temp.execute("SELECT identifiant FROM Compte")
-      #fetchall() permet de récupérer tous les résultats sous forme de liste
       utilisateurs = curseur_temp.fetchall() 
       connexion_temp.close()
 
@@ -373,7 +372,6 @@ def menu_console():
 
     elif choix == "6":
       print("\n--- SUPPRIMER UN QUIZ ---")
-      # On affiche d'abord la liste pour que l'utilisateur voie les ID ou les noms
       liste_quiz()
       valeur = input("Entrez l'ID du quiz ou son nom (ex: fichier) à supprimer : ")
       supprimer_quiz(valeur)

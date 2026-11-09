@@ -172,7 +172,7 @@ navigation = tk.Frame(
 navigation.pack(side="left", fill="y")
 
 # Création des boutons Quiz et Mes activités
-for nom_page in ("Quiz", "Mes activités"):
+for nom_page in ("Quiz", "Mes activités","Créer un quiz"):
 
     # Création d'un bouton pour chaque page
     bouton = tk.Button(
@@ -1202,10 +1202,10 @@ def changer_mode_auth():
 # ============================================================
 # 26. VALIDATION DU FORMULAIRE ET CONNEXION
 # ============================================================
-
+admin=0
 def envoyer_formulaire_auth():
     # Permet de modifier les variables globales
-    global connecte, page_actuelle,identifiant_bd
+    global connecte, page_actuelle,identifiant_bd,admin
 
     # Récupère les valeurs des champs obligatoires
     # strip() supprime les espaces au début et à la fin de l'identifiant
@@ -1251,8 +1251,9 @@ def envoyer_formulaire_auth():
             )
             return
         else:
+            #récupération de la variable pour savoir si le compte est admin
             admin=verifier_connexion(identifiant_creer, mdp_creer)[1]
-
+            print(admin)
 
     # Indique que l'utilisateur est considéré comme connecté
     connecte = True
@@ -1285,87 +1286,177 @@ def envoyer_formulaire_auth():
     historique_afficher=""
     for k in historique:
         historique_afficher+=k+"\n\n"
-    for nom_page, titre, description, message in (
-        (
-            "Accueil",
-            "Bienvenue sur SQuizi !",
-            "Votre espace pour apprendre en vous amusant.",
-            "Est-ce que c'est bon pour vous ?",
-        ),
-        (
-            "Mes activités",
-            "Mes activités",
-            "Retrouvez ici votre progression et vos résultats.",
-            #mettre les valeurs de historique
-            historique_afficher,
-        ),
-    ):
-
-        # Création du conteneur de la page
-        page = tk.Frame(
-            contenu,
-            bg="#f7f8fc"
-        )
-
-        # Affichage du titre de la page
-        # Le titre de l'accueil est dynamique et pourra afficher l'identifiant saisi
-        if nom_page == "Accueil":
+    if admin==1:
+        print("connexion administrateur")
+        for nom_page, titre, description, message in (
+            (
+                "Accueil",
+                "Bienvenue sur SQuizi !",
+                "Votre espace pour apprendre en vous amusant.",
+                "Est-ce que c'est bon pour vous ?",
+            ),
+            (
+                "Mes activités",
+                "Mes activités",
+                "Retrouvez ici votre progression et vos résultats.",
+                #mettre les valeurs de historique
+                historique_afficher,
+            ),
+            (
+                "Créer un quiz",
+                "Création de quiz",
+                "Créez un quiz",
+                "Coucou",
+            ),
+        ):
+        
+            # Création du conteneur de la page
+            page = tk.Frame(
+                contenu,
+                bg="#f7f8fc"
+            )
+        
+            # Affichage du titre de la page
+            # Le titre de l'accueil est dynamique et pourra afficher l'identifiant saisi
+            if nom_page == "Accueil":
+                tk.Label(
+                    page,
+                    textvariable=titre_accueil,
+                    bg="#f7f8fc",
+                    fg="#252633",
+                    font=("Arial", 25, "bold"),
+                ).pack(anchor="w")
+            else:
+                tk.Label(
+                    page,
+                    text=titre,
+                    bg="#f7f8fc",
+                    fg="#252633",
+                    font=("Arial", 25, "bold"),
+                ).pack(anchor="w")
+        
+            # Affichage de la description sous le titre
             tk.Label(
                 page,
-                textvariable=titre_accueil,
+                text=description,
                 bg="#f7f8fc",
-                fg="#252633",
-                font=("Arial", 25, "bold"),
+                fg="#686a75",
+                font=("Arial", 12),
+            ).pack(anchor="w", pady=(8, 28))
+        
+            # Création d'une carte blanche contenant le message
+            carte = tk.Frame(
+                page,
+                bg="white",
+                padx=24,
+                pady=24
+            )
+        
+            # Affichage de la carte sur toute la largeur disponible
+            carte.pack(fill="x")
+        
+            # Affichage du message de la carte
+            tk.Label(
+                carte,
+                text=message,
+                bg="white",
+                fg="#686a75",
+                font=("Arial", 12),
             ).pack(anchor="w")
-        else:
+        
+            # Enregistrement de la page dans le dictionnaire
+            pages[nom_page] = page
+        
+            # Superposition de la page avec les autres pages
+            # relwidth et relheight lui donnent toute la zone de contenu
+            page.place(
+                relx=0,
+                rely=0,
+                relwidth=1,
+                relheight=1
+            )
+    else:        
+        for nom_page, titre, description, message in (
+            (
+                "Accueil",
+                "Bienvenue sur SQuizi !",
+                "Votre espace pour apprendre en vous amusant.",
+                "Est-ce que c'est bon pour vous ?",
+            ),
+            (
+                "Mes activités",
+                "Mes activités",
+                "Retrouvez ici votre progression et vos résultats.",
+                #mettre les valeurs de historique
+                historique_afficher,
+            ),
+        ):
+
+            # Création du conteneur de la page
+            page = tk.Frame(
+                contenu,
+                bg="#f7f8fc"
+            )
+
+            # Affichage du titre de la page
+            # Le titre de l'accueil est dynamique et pourra afficher l'identifiant saisi
+            if nom_page == "Accueil":
+                tk.Label(
+                    page,
+                    textvariable=titre_accueil,
+                    bg="#f7f8fc",
+                    fg="#252633",
+                    font=("Arial", 25, "bold"),
+                ).pack(anchor="w")
+            else:
+                tk.Label(
+                    page,
+                    text=titre,
+                    bg="#f7f8fc",
+                    fg="#252633",
+                    font=("Arial", 25, "bold"),
+                ).pack(anchor="w")
+
+            # Affichage de la description sous le titre
             tk.Label(
                 page,
-                text=titre,
+                text=description,
                 bg="#f7f8fc",
-                fg="#252633",
-                font=("Arial", 25, "bold"),
+                fg="#686a75",
+                font=("Arial", 12),
+            ).pack(anchor="w", pady=(8, 28))
+
+            # Création d'une carte blanche contenant le message
+            carte = tk.Frame(
+                page,
+                bg="white",
+                padx=24,
+                pady=24
+            )
+
+            # Affichage de la carte sur toute la largeur disponible
+            carte.pack(fill="x")
+
+            # Affichage du message de la carte
+            tk.Label(
+                carte,
+                text=message,
+                bg="white",
+                fg="#686a75",
+                font=("Arial", 12),
             ).pack(anchor="w")
 
-        # Affichage de la description sous le titre
-        tk.Label(
-            page,
-            text=description,
-            bg="#f7f8fc",
-            fg="#686a75",
-            font=("Arial", 12),
-        ).pack(anchor="w", pady=(8, 28))
+            # Enregistrement de la page dans le dictionnaire
+            pages[nom_page] = page
 
-        # Création d'une carte blanche contenant le message
-        carte = tk.Frame(
-            page,
-            bg="white",
-            padx=24,
-            pady=24
-        )
-
-        # Affichage de la carte sur toute la largeur disponible
-        carte.pack(fill="x")
-
-        # Affichage du message de la carte
-        tk.Label(
-            carte,
-            text=message,
-            bg="white",
-            fg="#686a75",
-            font=("Arial", 12),
-        ).pack(anchor="w")
-
-        # Enregistrement de la page dans le dictionnaire
-        pages[nom_page] = page
-
-        # Superposition de la page avec les autres pages
-        # relwidth et relheight lui donnent toute la zone de contenu
-        page.place(
-            relx=0,
-            rely=0,
-            relwidth=1,
-            relheight=1
-        )
+            # Superposition de la page avec les autres pages
+            # relwidth et relheight lui donnent toute la zone de contenu
+            page.place(
+                relx=0,
+                rely=0,
+                relwidth=1,
+                relheight=1
+            )
 
 
     # Redirige l'utilisateur vers la page d'accueil

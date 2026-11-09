@@ -45,7 +45,7 @@ def poser_question(quest, props, reps):
         return False
 
 def obtenir_donnees(titre:str):
-    with open(f"{titre}.txt", "r", encoding="utf-8") as fichier:
+    with open(f"{titre}", "r", encoding="utf-8") as fichier:
         lignes = fichier.readlines()
     contenu = []
     for l in lignes:
