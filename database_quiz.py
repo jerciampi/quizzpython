@@ -385,5 +385,12 @@ def menu_console():
     else:
       print("\n[Erreur] Choix invalide, veuillez choisir entre 1, 2, 3, 4, 5, 6 et 7.")
 
+#connexion = sqlite3.connect("quiz_database.db")
+#curseur = connexion.cursor()
 
+#curseur.execute(
+#    """INSERT INTO Compte (identifiant, mdp, admin) VALUES ("admin","admin",1)""",
+#)
+#connexion.commit()
+#connexion.close()
 
