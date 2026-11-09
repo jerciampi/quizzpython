@@ -144,14 +144,17 @@ zone_logo.pack(
 # Création du bouton servant de logo
 # Un clic permet de revenir à la page d'accueil
 
+image_logo = tk.PhotoImage(file="logo.png", master=fenetre)
+image_reduite = image_logo.subsample(12, 12)
 logo = tk.Button(
     zone_logo,
     command=lambda: afficher_page("Accueil"),
+    image=image_reduite,
     bg="#d5d5d9",
     fg="#55565e",
     font=("Arial", 10, "bold"),
-    width=9,
-    height=2,
+    width=60,
+    height=80  ,
     relief="flat",
     borderwidth=0,
     activebackground="#c9c9ce",
