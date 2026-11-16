@@ -187,9 +187,11 @@ def ajouter_quiz_depuis_fichier(chemin_fichier):
         connexion.commit()
         connexion.close()
         print(f"Quiz '{nom_quiz}' ajouté avec succès !")
+        return True
         
     except FileNotFoundError:
         print(f"Erreur : Le fichier '{chemin_fichier}' est introuvable.")
+        return False
 
 def liste_quiz():
   """Affiche la liste des quizs."""
@@ -307,7 +309,7 @@ def obtenir_historique(identifiant):
     
     for h in historique_utilisateur:
         id_hist, score, date, heure, chronometre, id_quiz, fiche_quiz = h
-        nom_quiz = fiche_quiz.split("/")[-1]
+        nom_quiz = fiche_quiz[5:]
         mins = chronometre // 60
         secs = chronometre % 60
         texte_partie = f'Quiz : {nom_quiz} | le score est de {score} en {mins:02d}min{secs:02d}s secondes réalisé à {heure} le {date}'

@@ -70,4 +70,3 @@ def obtenir_donnees(titre:str):
             propositions.append(prop)
     #ici j'ai mon quiz trié
     return questions,propositions,reponses
-

@@ -4,7 +4,6 @@
 
 import os
 import sqlite3
-import time
 import tkinter as tk
 
 # Importation des modules backend du projet

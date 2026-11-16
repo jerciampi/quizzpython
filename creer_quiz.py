@@ -1,9 +1,9 @@
 def creer_fichier(titre):
-    with open(f"Quiz/{titre}.txt", "w", encoding="utf-8"):
+    with open(f"Quiz/{titre}", "w", encoding="utf-8"):
         return True 
 
 def ajout_question(titre, question, liste_rep, rep):
-    with open(f"Quiz/{titre}.txt", "w", encoding="utf-8") as new_file:
+    with open(f"Quiz/{titre}", "a", encoding="utf-8") as new_file:
         new_file.write("QUES\n")
         new_file.write(f"{question} \n")
         new_file.write("PROP \n")
