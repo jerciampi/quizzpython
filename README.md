@@ -11,11 +11,11 @@
 
 ### Espace Administrateur
 * **Création de quiz :** Ajout d'un nouveau quiz directement depuis l'interface graphique.
-* **Gestion :** Affichage de la liste des quiz enregistrés et suppression de quiz.
+* **Gestion :** Affichage de la liste des quiz enregistrés.
 
 ## Installation et prérequis
 
-L'application fonctionne avec **Python 3** et utilise principalement des modules inclus de base (`tkinter` pour l'interface graphique, `sqlite3` pour la base de données, `datetime`).
+L'application fonctionne avec **Python 3** et utilise principalement des modules inclus de base (`tkinter` pour l'interface graphique, `sqlite3` pour la base de données, `datetime` pour enregistrer les historiques).
 
  **Cloner le dépôt :**
    ```bash
@@ -49,4 +49,4 @@ L'application fonctionne avec **Python 3** et utilise principalement des modules
 
 ## Auteurs
 
-Projet réalisé par Hugo Holdrinet, Bastien Cheneval, Alban Stora, Antoine Cizere, Jeremy Ciampi dans le cadre de l'UE PROJ531.
+Projet réalisé par Hugo Holdrinet, Bastien Cheneval, Alban Stora, Antoine Sizaire, Jeremy Ciampi dans le cadre du module PROJ531.
