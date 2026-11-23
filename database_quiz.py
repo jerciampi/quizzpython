@@ -406,13 +406,13 @@ def menu_console():
     else:
       print("\n[Erreur] Choix invalide, veuillez choisir entre 1, 2, 3, 4, 5, 6 et 7.")
 
-#connexion = sqlite3.connect("quiz_database.db")
-#curseur = connexion.cursor() 
-#curseur.execute(
-#     """UPDATE Historique SET chronometre = 120 WHERE chronometre IS NULL;""",
-#)
-#connexion.commit()
-#connexion.close()
+# connexion = sqlite3.connect("quiz_database.db")
+# curseur = connexion.cursor() 
+# curseur.execute(
+#      """DELETE FROM Quiz WHERE fiche_quiz LIKE '%test%';""",
+# )
+# connexion.commit()
+# connexion.close()
       
 
 
