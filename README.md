@@ -10,25 +10,20 @@
 * **Suivi :** Consultation de l'historique personnel (scores, dates, temps réalisés) et accès au classement général (*Leaderboard*).
 
 ### Espace Administrateur
-* **Création de quiz :** Ajout d'un nouveau quiz directement depuis l'interface graphique ou par importation d'un fichier texte (`.txt`).
+* **Création de quiz :** Ajout d'un nouveau quiz directement depuis l'interface graphique.
 * **Gestion :** Affichage de la liste des quiz enregistrés et suppression de quiz.
 
 ## Installation et prérequis
 
 L'application fonctionne avec **Python 3** et utilise principalement des modules inclus de base (`tkinter` pour l'interface graphique, `sqlite3` pour la base de données, `datetime`).
 
-1. **Cloner le dépôt :**
+ **Cloner le dépôt :**
    ```bash
    git clone https://github.com/jerciampi/quizzpython.git
    cd quizzpython
    ```
 
-2. **Installer les dépendances (si besoin) :**
-   Si la bibliothèque `Pillow` est requise pour l'affichage du logo dans l'interface, installez-la via :
-   ```bash
-   pip install pillow
-   ```
-   *(Sur certaines distributions Linux, le paquet `python3-tk` peut aussi être nécessaire.)*
+
 
 ## Comment ça marche ?
 
